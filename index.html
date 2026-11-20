@@ -3,26 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RGB STORE</title>
+<title>CikiCuy</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
 body{background:#f1f3f5}
-.hero{background:#111;color:#fff;padding:35px 0;text-align:center;border-radius:0 0 20px 20px}
+.hero{background:#FF5DA2;color:#fff;padding:0 0 35px 0;text-align:center;border-radius:0 0 20px 20px;position:relative;overflow:hidden}
+.hero-banner{width:100%;height:220px;object-fit:cover;display:none}
+.hero-banner.show{display:block}
+.hero-logo{width:90px;height:90px;object-fit:cover;border-radius:50%;border:4px solid #fff;background:#fff;margin-top:-45px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:none}
+.hero-logo.show{display:inline-block}
 .card img{height:180px;object-fit:cover}
-.top-btn{position:fixed;bottom:20px;right:20px;z-index:9999}
-.sidebar{background:#111;color:#fff;min-height:100vh;padding:20px}
-.sidebar a{color:#fff;text-decoration:none;display:block;padding:10px;border-radius:8px;margin-bottom:5px}
+.sidebar{background:#FF5DA2;color:#fff;min-height:100vh;padding:20px;text-align:center}
+.sidebar a{color:#fff;text-decoration:none;display:block;padding:10px;border-radius:8px;margin-bottom:5px;text-align:left}
 .sidebar a.active,.sidebar a:hover{background:#ffc107;color:#000}
+.sidebar-logo{width:80px;height:80px;object-fit:cover;border-radius:50%;border:3px solid #fff;background:#fff;display:none;margin:0 auto 10px}
+.sidebar-logo.show{display:block}
 .stat-card{border-radius:15px;padding:20px;color:#fff}
+.dot-menu{position:fixed;top:10px;right:12px;z-index:9999;background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:32px;height:32px;font-size:20px;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,0.2);cursor:pointer;color:#333}
+.dot-dropdown{position:fixed;top:48px;right:12px;z-index:10000;background:#fff;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,0.25);width:200px;display:none;overflow:hidden}
+.dot-dropdown button{display:block;width:100%;text-align:left;border:none;background:#fff;padding:12px 15px;font-size:14px}
+.dot-dropdown button:hover{background:#f1f3f5}
+.color-row{display:flex;gap:10px;align-items:center}
+.color-row input[type=color]{width:60px;height:45px;border:none;border-radius:8px;cursor:pointer;padding:0}
+.preset-btn{border:2px solid #ddd;border-radius:50%;width:38px;height:38px;cursor:pointer}
+.preview-img{width:100%;max-height:150px;object-fit:cover;border-radius:12px;display:none;margin-top:8px}
+.preview-img.show{display:block}
+.preview-logo{width:80px;height:80px;object-fit:cover;border-radius:50%;display:none;margin-top:8px;border:2px solid #ddd}
+.preview-logo.show{display:block}
 </style>
 </head>
 <body>
+<button class="dot-menu" onclick="toggleDotMenu()">⋮</button>
+<div class="dot-dropdown" id="dotMenu">
+<button onclick="bukaDashboardLogin()">🔐 Login Admin</button>
+<button onclick="kembaliKeToko();toggleDotMenu()">🛍️ Lihat Toko</button>
+</div>
 <div id="halamanToko">
-<div class="hero">
-<h1 id="namaToko">RGB STORE</h1>
+<div class="hero" id="heroToko">
+<img id="bannerImgToko" class="hero-banner" src="">
+<img id="logoImgToko" class="hero-logo" src="">
+<div style="padding:15px 10px 0">
+<h1 id="namaToko" onclick="klikNamaToko()" style="cursor:pointer;user-select:none;margin-top:10px">CikiCuy</h1>
 <p id="descToko">Toko Online Murah, Cepat & Terpercaya</p>
 <button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang (<span id="jumlahCart">0</span>)</button>
-<button class="btn btn-light" onclick="bukaDashboardLogin()">🔐 LOGIN ADMIN</button>
+</div>
 </div>
 <div class="container my-4">
 <div class="alert alert-warning text-center" id="bannerToko">🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!</div>
@@ -41,12 +65,11 @@ body{background:#f1f3f5}
 <button class="btn btn-success" onclick="checkoutWA()">Checkout via WhatsApp</button>
 <button class="btn btn-danger" onclick="hapusCart()">Hapus Keranjang</button>
 </div>
-<button class="btn btn-dark top-btn" onclick="bukaDashboardLogin()">⚙️ DASHBOARD ADMIN</button>
 </div>
 <div id="halamanLogin" style="display:none">
 <div class="container d-flex justify-content-center align-items-center" style="min-height:100vh">
 <div class="card p-4 shadow" style="width:100%;max-width:400px">
-<div class="text-center mb-3"><h1>🔐</h1><h3>Login Admin</h3><p class="text-muted">Masuk untuk atur toko</p></div>
+<div class="text-center mb-3"><img id="logoLogin" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:none"><h1>🔐</h1><h3>Login Admin</h3><p class="text-muted">Masuk untuk atur toko</p></div>
 <label>Username</label><input id="loginUser" class="form-control mb-2" placeholder="Username">
 <label>Password</label><input id="loginPass" type="password" class="form-control mb-3" placeholder="Password">
 <div class="alert alert-info small">Akun awal:<br>Username: <b>admin</b><br>Password: <b>admin123</b></div>
@@ -57,8 +80,9 @@ body{background:#f1f3f5}
 </div>
 <div id="halamanDashboard" style="display:none">
 <div class="row g-0">
-<div class="col-md-3 sidebar">
-<h3>📊 RGB ADMIN</h3><p>Selamat datang, <b id="namaAdmin">admin</b></p>
+<div class="col-md-3 sidebar" id="sidebarAdmin">
+<img id="logoSidebar" class="sidebar-logo" src="">
+<h3>📊 CikiCuy ADMIN</h3><p>Selamat datang, <b id="namaAdmin">admin</b></p>
 <a href="#" class="active" onclick="showTab('tabHome',this)">🏠 Dashboard</a>
 <a href="#" onclick="showTab('tabProduk',this)">📦 Produk</a>
 <a href="#" onclick="showTab('tabPesanan',this)">🧾 Pesanan</a>
@@ -82,7 +106,29 @@ body{background:#f1f3f5}
 <div class="row"><div class="col-md-6"><input id="pNama" class="form-control mb-2" placeholder="Nama Produk"></div><div class="col-md-6"><input id="pHarga" type="number" class="form-control mb-2" placeholder="Harga contoh 150000"></div><div class="col-md-6"><input id="pGambar" class="form-control mb-2" placeholder="Link Gambar https://..."></div><div class="col-md-6"><input id="pStok" type="number" class="form-control mb-2" placeholder="Stok contoh 10"></div><div class="col-12"><textarea id="pDesc" class="form-control mb-2" placeholder="Deskripsi Produk"></textarea></div></div>
 <button class="btn btn-success w-100" onclick="simpanProduk()">💾 Simpan Produk</button></div><div id="listAdminProduk"></div></div>
 <div id="tabPesanan" style="display:none"><h2>Daftar Pesanan</h2><div id="listPesanan"></div><button class="btn btn-danger" onclick="hapusSemuaPesanan()">Hapus Semua Pesanan</button></div>
-<div id="tabSetting" style="display:none"><h2>Pengaturan Toko</h2><div class="card p-3"><label>Nama Toko</label><input id="inputNamaToko" class="form-control mb-2"><label>Deskripsi Toko</label><input id="inputDescToko" class="form-control mb-2"><label>Banner Promo</label><input id="inputBanner" class="form-control mb-2"><label>No WA (contoh 62812...)</label><input id="inputWA" class="form-control mb-2"><button class="btn btn-warning w-100" onclick="simpanSetting()">Simpan Pengaturan</button></div></div>
+<div id="tabSetting" style="display:none"><h2>Pengaturan Toko</h2><div class="card p-3"><label>Nama Toko</label><input id="inputNamaToko" class="form-control mb-2"><label>Deskripsi Toko</label><input id="inputDescToko" class="form-control mb-2"><label>Banner Promo (Tulisan)</label><input id="inputBanner" class="form-control mb-2"><label>No WA (contoh 62812...)</label><input id="inputWA" class="form-control mb-2">
+<hr><h5>🖼️ Foto Logo / Foto Profil Toko</h5>
+<label>Upload dari HP / Laptop</label><input type="file" accept="image/*" class="form-control mb-2" onchange="uploadLogo(event)">
+<label>Atau Tempel Link Foto https://...</label><input id="inputLogo" class="form-control mb-1" placeholder="https://...foto-logo..." oninput="previewLogoLink(this.value)">
+<img id="previewLogo" class="preview-logo" src="">
+<button class="btn btn-sm btn-outline-danger mt-1 mb-3" onclick="hapusLogo()">Hapus Logo</button>
+<hr><h5>🌄 Foto Banner Atas Toko</h5>
+<label>Upload dari HP / Laptop</label><input type="file" accept="image/*" class="form-control mb-2" onchange="uploadBanner(event)">
+<label>Atau Tempel Link Foto https://...</label><input id="inputBannerImg" class="form-control mb-1" placeholder="https://...foto-banner..." oninput="previewBannerLink(this.value)">
+<img id="previewBanner" class="preview-img" src="">
+<button class="btn btn-sm btn-outline-danger mt-1 mb-3" onclick="hapusBanner()">Hapus Banner</button>
+<div class="alert alert-info small">Tips: Foto banner yang bagus itu yang lebar (landscape), contoh foto dagangan lu dijejerin. Foto logo yang bagus itu yang kotak / bulat, contoh logo CikiCuy.</div>
+<hr><label>🎨 Warna Toko & Dashboard</label>
+<div class="color-row mb-2"><input type="color" id="inputWarna" value="#FF5DA2" oninput="previewWarna(this.value)"><input id="inputWarnaText" class="form-control" value="#FF5DA2" oninput="previewWarna(this.value)"><button class="btn btn-outline-dark" onclick="previewWarna(document.getElementById('inputWarna').value)">Lihat</button></div>
+<div class="d-flex gap-2 flex-wrap mb-2">
+<button class="preset-btn" style="background:#FF5DA2" onclick="pilihWarna('#FF5DA2')"></button>
+<button class="preset-btn" style="background:#14B8A6" onclick="pilihWarna('#14B8A6')"></button>
+<button class="preset-btn" style="background:#1E3A8A" onclick="pilihWarna('#1E3A8A')"></button>
+<button class="preset-btn" style="background:#7C3AED" onclick="pilihWarna('#7C3AED')"></button>
+<button class="preset-btn" style="background:#F97316" onclick="pilihWarna('#F97316')"></button>
+<button class="preset-btn" style="background:#111111" onclick="pilihWarna('#111111')"></button>
+</div>
+<button class="btn btn-warning w-100" onclick="simpanSetting()">Simpan Pengaturan</button></div></div>
 <div id="tabAkun" style="display:none"><h2>Ganti Akun Admin</h2><div class="card p-3"><label>Username Baru</label><input id="newUser" class="form-control mb-2"><label>Password Baru</label><input id="newPass" class="form-control mb-2" placeholder="Minimal 4 karakter"><button class="btn btn-dark w-100" onclick="gantiAkun()">Ganti Username & Password</button><button class="btn btn-outline-danger w-100 mt-2" onclick="resetToko()">Reset Toko Ke Awal</button></div></div>
 </div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -91,13 +137,33 @@ let defaultProduk=[{id:1,nama:"Sepatu Sneakers",harga:250000,stok:10,img:"https:
 let products=JSON.parse(localStorage.getItem('myProduk')||'null')||defaultProduk;
 let cart=JSON.parse(localStorage.getItem('myCart')||'[]');
 let orders=JSON.parse(localStorage.getItem('myOrders')||'[]');
-let setting=JSON.parse(localStorage.getItem('mySetting')||'{"nama":"RGB STORE","wa":"6281234567890","desc":"Toko Online Murah, Cepat & Terpercaya","banner":"🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!"}');
+let setting=JSON.parse(localStorage.getItem('mySetting')||'{"nama":"CikiCuy","wa":"6285178360714","desc":"Toko Online Murah, Cepat & Terpercaya","banner":"🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!","warna":"#FF5DA2","logo":"","bannerImg":""}');
+if(!setting.warna) setting.warna='#FF5DA2'; if(setting.logo===undefined) setting.logo=''; if(setting.bannerImg===undefined) setting.bannerImg='';
 let akun=JSON.parse(localStorage.getItem('myAkun')||'{"user":"admin","pass":"admin123"}');
 let kunjungan=parseInt(localStorage.getItem('myKunjung')||'0')+1; localStorage.setItem('myKunjung',kunjungan);
+let klikNama=0; let klikTimer=null;
+function toggleDotMenu(){let m=document.getElementById('dotMenu'); m.style.display=(m.style.display==='block'?'none':'block');}
+function klikNamaToko(){klikNama++; clearTimeout(klikTimer); klikTimer=setTimeout(()=>{klikNama=0},1500); if(klikNama>=5){klikNama=0; bukaDashboardLogin();}}
+document.addEventListener('click',function(e){let m=document.getElementById('dotMenu'); let btn=document.querySelector('.dot-menu'); if(m && m.style.display==='block' && !m.contains(e.target) && !btn.contains(e.target)){m.style.display='none';}});
 function save(){localStorage.setItem('myProduk',JSON.stringify(products));localStorage.setItem('myCart',JSON.stringify(cart));localStorage.setItem('mySetting',JSON.stringify(setting));localStorage.setItem('myOrders',JSON.stringify(orders));localStorage.setItem('myAkun',JSON.stringify(akun));}
 function formatRupiah(n){return 'Rp '+n.toLocaleString('id-ID')}
-function updateTokoUI(){document.getElementById('namaToko').innerText=setting.nama;document.getElementById('descToko').innerText=setting.desc;document.getElementById('bannerToko').innerText=setting.banner;}
+function isWarnaTerang(hex){hex=hex.replace('#','');let r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);let lum=(0.299*r+0.587*g+0.114*b)/255;return lum>0.7;}
+function applyWarna(warna){let hero=document.getElementById('heroToko');let side=document.getElementById('sidebarAdmin');if(hero)hero.style.background=warna;if(side)side.style.background=warna;let terang=isWarnaTerang(warna);let txt=terang?'#111':'#fff';if(hero)hero.style.color=txt;if(side)side.style.color=txt;if(side){side.querySelectorAll('a').forEach(a=>a.style.color=txt)}}
+function updateTokoUI(){document.getElementById('namaToko').innerText=setting.nama;document.getElementById('descToko').innerText=setting.desc;document.getElementById('bannerToko').innerText=setting.banner;applyWarna(setting.warna||'#FF5DA2');
+let b=document.getElementById('bannerImgToko'); if(setting.bannerImg){b.src=setting.bannerImg; b.classList.add('show');} else {b.classList.remove('show'); b.src='';}
+let l=document.getElementById('logoImgToko'); if(setting.logo){l.src=setting.logo; l.classList.add('show');} else {l.classList.remove('show');}
+let ls=document.getElementById('logoSidebar'); if(setting.logo){ls.src=setting.logo; ls.classList.add('show');} else {ls.classList.remove('show');}
+let ll=document.getElementById('logoLogin'); if(setting.logo){ll.src=setting.logo; ll.style.display='block';} else {ll.style.display='none';}
+}
 updateTokoUI();
+function pilihWarna(w){document.getElementById('inputWarna').value=w;document.getElementById('inputWarnaText').value=w;previewWarna(w);}
+function previewWarna(w){if(!w.startsWith('#'))w='#'+w;document.getElementById('inputWarnaText').value=w;try{document.getElementById('inputWarna').value=w;}catch(e){}applyWarna(w);}
+function uploadLogo(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=function(ev){document.getElementById('inputLogo').value=ev.target.result; let p=document.getElementById('previewLogo'); p.src=ev.target.result; p.classList.add('show'); alert('Foto logo dipilih! Jangan lupa klik Simpan Pengaturan');}; r.readAsDataURL(f);}
+function uploadBanner(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=function(ev){document.getElementById('inputBannerImg').value=ev.target.result; let p=document.getElementById('previewBanner'); p.src=ev.target.result; p.classList.add('show'); alert('Foto banner dipilih! Jangan lupa klik Simpan Pengaturan');}; r.readAsDataURL(f);}
+function previewLogoLink(v){let p=document.getElementById('previewLogo'); if(v){p.src=v; p.classList.add('show');} else p.classList.remove('show');}
+function previewBannerLink(v){let p=document.getElementById('previewBanner'); if(v){p.src=v; p.classList.add('show');} else p.classList.remove('show');}
+function hapusLogo(){document.getElementById('inputLogo').value=''; document.getElementById('previewLogo').classList.remove('show'); setting.logo=''; save(); updateTokoUI(); alert('Logo dihapus');}
+function hapusBanner(){document.getElementById('inputBannerImg').value=''; document.getElementById('previewBanner').classList.remove('show'); setting.bannerImg=''; save(); updateTokoUI(); alert('Banner dihapus');}
 function tampilkanProduk(){let cari=document.getElementById('cari').value.toLowerCase();let f=document.getElementById('filterHarga').value;let list=products.filter(p=>p.nama.toLowerCase().includes(cari));if(f=='murah')list=list.filter(p=>p.harga<200000);if(f=='mahal')list=list.filter(p=>p.harga>=200000);document.getElementById('listProduk').innerHTML=list.map(p=>`<div class="col-md-4 mb-3"><div class="card h-100"><img src="${p.img}" onerror="this.src='https://via.placeholder.com/500'"><div class="card-body"><h5>${p.nama}</h5><p>${p.desc}</p><p><span class="badge bg-secondary">Stok: ${p.stok||0}</span></p><h6>${formatRupiah(p.harga)}</h6><div class="d-flex gap-1"><input type="number" value="1" min="1" id="qty-${p.id}" class="form-control" style="width:70px"><button class="btn btn-primary flex-fill" onclick="tambah(${p.id})">+ Keranjang</button></div></div></div></div>`).join('')||'<p class="text-center">Produk tidak ditemukan</p>';tampilkanCart();}
 function tambah(id){let qty=parseInt(document.getElementById('qty-'+id).value)||1;let item=cart.find(x=>x.id===id);if(item)item.qty+=qty;else{let p=products.find(x=>x.id===id);cart.push({...p,qty})}save();tampilkanCart();alert('Ditambah ke keranjang!');}
 function tampilkanCart(){document.getElementById('jumlahCart').innerText=cart.reduce((a,b)=>a+b.qty,0);let total=cart.reduce((a,b)=>a+b.harga*b.qty,0);document.getElementById('totalHarga').innerText=formatRupiah(total);if(cart.length==0){document.getElementById('cartList').innerHTML='<li class="list-group-item">Keranjang masih kosong</li>';return}document.getElementById('cartList').innerHTML=cart.map((c,i)=>`<li class="list-group-item d-flex justify-content-between align-items-center">${c.nama} <span><button class="btn btn-sm btn-outline-secondary" onclick="ubahQty(${i},-1)">-</button> ${c.qty} <button class="btn btn-sm btn-outline-secondary" onclick="ubahQty(${i},1)">+</button> <b>${formatRupiah(c.harga*c.qty)}</b> <button class="btn btn-sm btn-danger" onclick="hapusItem(${i})">x</button></span></li>`).join('');}
@@ -106,9 +172,9 @@ function hapusItem(i){cart.splice(i,1);save();tampilkanCart();}
 function hapusCart(){cart=[];save();tampilkanCart();}
 function scrollCart(){document.getElementById('cartSection').scrollIntoView({behavior:'smooth'})}
 function checkoutWA(){if(cart.length==0){alert('Keranjang kosong!');return}let nama=document.getElementById('namaPembeli').value||'Tanpa Nama';let alamat=document.getElementById('alamatPembeli').value||'-';let total=cart.reduce((a,b)=>a+b.harga*b.qty,0);let order={id:Date.now(),nama,alamat,items:[...cart],total,tanggal:new Date().toLocaleString('id-ID')};orders.unshift(order);cart=[];save();tampilkanCart();updateDashboard();let pesan=`Halo ${setting.nama}, saya ${nama} mau pesan:\nAlamat: ${alamat}\n`;order.items.forEach(c=>pesan+=`- ${c.nama} x ${c.qty} = ${formatRupiah(c.harga*c.qty)}\n`);pesan+=`Total: ${formatRupiah(total)}`;window.open(`https://wa.me/${setting.wa}?text=`+encodeURIComponent(pesan),'_blank');}
-function bukaDashboardLogin(){document.getElementById('halamanToko').style.display='none';document.getElementById('halamanLogin').style.display='block';document.getElementById('halamanDashboard').style.display='none';window.scrollTo(0,0);}
+function bukaDashboardLogin(){document.getElementById('dotMenu').style.display='none';document.getElementById('halamanToko').style.display='none';document.getElementById('halamanLogin').style.display='block';document.getElementById('halamanDashboard').style.display='none';window.scrollTo(0,0);}
 function kembaliKeToko(){document.getElementById('halamanToko').style.display='block';document.getElementById('halamanLogin').style.display='none';document.getElementById('halamanDashboard').style.display='none';tampilkanProduk();}
-function cekLogin(){let u=document.getElementById('loginUser').value.trim();let p=document.getElementById('loginPass').value.trim();if((u===akun.user && p===akun.pass)||p==='1234'){document.getElementById('halamanLogin').style.display='none';document.getElementById('halamanDashboard').style.display='block';document.getElementById('namaAdmin').innerText=akun.user;updateDashboard();tampilkanAdminList();tampilkanPesanan();isiSettingForm();}else alert('Username / Password salah! Coba admin / admin123');}
+function cekLogin(){let u=document.getElementById('loginUser').value.trim();let p=document.getElementById('loginPass').value.trim();if((u===akun.user && p===akun.pass)||p==='1234'){document.getElementById('halamanLogin').style.display='none';document.getElementById('halamanDashboard').style.display='block';document.getElementById('namaAdmin').innerText=akun.user;updateDashboard();tampilkanAdminList();tampilkanPesanan();isiSettingForm();applyWarna(setting.warna);}else alert('Username / Password salah! Coba admin / admin123');}
 function logoutAdmin(){document.getElementById('halamanDashboard').style.display='none';kembaliKeToko();}
 function showTab(id,el){['tabHome','tabProduk','tabPesanan','tabSetting','tabAkun'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));if(el)el.classList.add('active');}
 function updateDashboard(){document.getElementById('statProduk').innerText=products.length;document.getElementById('statPesanan').innerText=orders.length;document.getElementById('statOmset').innerText=formatRupiah(orders.reduce((a,b)=>a+b.total,0));document.getElementById('statKunjung').innerText=kunjungan;document.getElementById('topProduk').innerHTML=products.slice(0,3).map(p=>`<div class="d-flex justify-content-between border-bottom py-2">${p.nama} <b>${formatRupiah(p.harga)}</b></div>`).join('');document.getElementById('recentOrder').innerHTML=orders.slice(0,5).map(o=>`<div class="border p-2 mb-2 rounded"><b>${o.nama}</b> - ${formatRupiah(o.total)} <br><small>${o.tanggal} - ${o.alamat}</small></div>`).join('')||'Belum ada pesanan';}
@@ -118,8 +184,8 @@ function editProduk(id){let p=products.find(x=>x.id==id);document.getElementById
 function hapusProduk(id){if(confirm('Hapus produk ini?')){products=products.filter(x=>x.id!=id);save();tampilkanProduk();tampilkanAdminList();updateDashboard();}}
 function tampilkanPesanan(){document.getElementById('listPesanan').innerHTML=orders.map(o=>`<div class="card p-3 mb-2"><b>${o.nama} - ${formatRupiah(o.total)}</b><small>${o.tanggal} | ${o.alamat}</small><ul>${o.items.map(i=>`<li>${i.nama} x ${i.qty}</li>`).join('')}</ul></div>`).join('')||'Belum ada pesanan';}
 function hapusSemuaPesanan(){if(confirm('Hapus semua pesanan?')){orders=[];save();tampilkanPesanan();updateDashboard();}}
-function isiSettingForm(){document.getElementById('inputNamaToko').value=setting.nama;document.getElementById('inputDescToko').value=setting.desc;document.getElementById('inputBanner').value=setting.banner;document.getElementById('inputWA').value=setting.wa;}
-function simpanSetting(){setting.nama=document.getElementById('inputNamaToko').value||setting.nama;setting.desc=document.getElementById('inputDescToko').value||setting.desc;setting.banner=document.getElementById('inputBanner').value||setting.banner;setting.wa=document.getElementById('inputWA').value||setting.wa;save();updateTokoUI();alert('Pengaturan tersimpan!');}
+function isiSettingForm(){document.getElementById('inputNamaToko').value=setting.nama;document.getElementById('inputDescToko').value=setting.desc;document.getElementById('inputBanner').value=setting.banner;document.getElementById('inputWA').value=setting.wa;document.getElementById('inputWarna').value=setting.warna||'#FF5DA2';document.getElementById('inputWarnaText').value=setting.warna||'#FF5DA2';document.getElementById('inputLogo').value=setting.logo||'';document.getElementById('inputBannerImg').value=setting.bannerImg||'';let pl=document.getElementById('previewLogo'); if(setting.logo){pl.src=setting.logo; pl.classList.add('show');} let pb=document.getElementById('previewBanner'); if(setting.bannerImg){pb.src=setting.bannerImg; pb.classList.add('show');}}
+function simpanSetting(){setting.nama=document.getElementById('inputNamaToko').value||setting.nama;setting.desc=document.getElementById('inputDescToko').value||setting.desc;setting.banner=document.getElementById('inputBanner').value||setting.banner;setting.wa=document.getElementById('inputWA').value||setting.wa;setting.warna=document.getElementById('inputWarnaText').value||document.getElementById('inputWarna').value||setting.warna;setting.logo=document.getElementById('inputLogo').value||setting.logo;setting.bannerImg=document.getElementById('inputBannerImg').value||setting.bannerImg;save();updateTokoUI();alert('Pengaturan tersimpan! Foto + Warna udah berubah.');}
 function gantiAkun(){let u=document.getElementById('newUser').value.trim();let p=document.getElementById('newPass').value.trim();if(!u||!p){alert('Isi username & password baru!');return}akun={user:u,pass:p};save();alert('Akun berhasil diganti! Login baru: '+u+' / '+p);}
 function resetToko(){if(confirm('Reset semua?')){localStorage.clear();location.reload();}}
 tampilkanProduk();updateDashboard();
