@@ -30,6 +30,13 @@ body{background:#f1f3f5}
 .preview-img.show{display:block}
 .preview-logo{width:80px;height:80px;object-fit:cover;border-radius:50%;display:none;margin-top:8px;border:2px solid #ddd}
 .preview-logo.show{display:block}
+/* SHOPEE STYLE */
+.cart-badge{transition:transform 0.2s}
+.cart-badge.bump{transform:scale(1.4)}
+.shopee-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#222;color:#fff;padding:12px 16px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:99999;box-shadow:0 8px 25px rgba(0,0,0,0.35);opacity:0;transition:all 0.3s;max-width:92%;font-size:14px}
+.shopee-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.shopee-toast button{background:#FF5DA2;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-weight:bold;white-space:nowrap}
+.shopee-toast img{width:38px;height:38px;object-fit:cover;border-radius:8px}
 </style>
 </head>
 <body>
@@ -45,7 +52,7 @@ body{background:#f1f3f5}
 <div style="padding:15px 10px 0">
 <h1 id="namaToko" onclick="klikNamaToko()" style="cursor:pointer;user-select:none;margin-top:10px">CikiCuy</h1>
 <p id="descToko">Toko Online Murah, Cepat & Terpercaya</p>
-<button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang (<span id="jumlahCart">0</span>)</button>
+<button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang (<span id="jumlahCart" class="cart-badge" style="display:inline-block">0</span>)</button>
 </div>
 </div>
 <div class="container my-4">
@@ -66,6 +73,7 @@ body{background:#f1f3f5}
 <button class="btn btn-danger" onclick="hapusCart()">Hapus Keranjang</button>
 </div>
 </div>
+<div id="shopeeToast" class="shopee-toast"><img id="toastImg" src=""><span id="toastText">Ditambah ke keranjang!</span><button onclick="scrollCart();hideToast()">Lihat Keranjang</button></div>
 <div id="halamanLogin" style="display:none">
 <div class="container d-flex justify-content-center align-items-center" style="min-height:100vh">
 <div class="card p-4 shadow" style="width:100%;max-width:400px">
@@ -117,7 +125,6 @@ body{background:#f1f3f5}
 <label>Atau Tempel Link Foto https://...</label><input id="inputBannerImg" class="form-control mb-1" placeholder="https://...foto-banner..." oninput="previewBannerLink(this.value)">
 <img id="previewBanner" class="preview-img" src="">
 <button class="btn btn-sm btn-outline-danger mt-1 mb-3" onclick="hapusBanner()">Hapus Banner</button>
-<div class="alert alert-info small">Tips: Foto banner yang bagus itu yang lebar (landscape), contoh foto dagangan lu dijejerin. Foto logo yang bagus itu yang kotak / bulat, contoh logo CikiCuy.</div>
 <hr><label>🎨 Warna Toko & Dashboard</label>
 <div class="color-row mb-2"><input type="color" id="inputWarna" value="#FF5DA2" oninput="previewWarna(this.value)"><input id="inputWarnaText" class="form-control" value="#FF5DA2" oninput="previewWarna(this.value)"><button class="btn btn-outline-dark" onclick="previewWarna(document.getElementById('inputWarna').value)">Lihat</button></div>
 <div class="d-flex gap-2 flex-wrap mb-2">
@@ -141,7 +148,7 @@ let setting=JSON.parse(localStorage.getItem('mySetting')||'{"nama":"CikiCuy","wa
 if(!setting.warna) setting.warna='#FF5DA2'; if(setting.logo===undefined) setting.logo=''; if(setting.bannerImg===undefined) setting.bannerImg='';
 let akun=JSON.parse(localStorage.getItem('myAkun')||'{"user":"admin","pass":"admin123"}');
 let kunjungan=parseInt(localStorage.getItem('myKunjung')||'0')+1; localStorage.setItem('myKunjung',kunjungan);
-let klikNama=0; let klikTimer=null;
+let klikNama=0; let klikTimer=null; let toastTimer=null;
 function toggleDotMenu(){let m=document.getElementById('dotMenu'); m.style.display=(m.style.display==='block'?'none':'block');}
 function klikNamaToko(){klikNama++; clearTimeout(klikTimer); klikTimer=setTimeout(()=>{klikNama=0},1500); if(klikNama>=5){klikNama=0; bukaDashboardLogin();}}
 document.addEventListener('click',function(e){let m=document.getElementById('dotMenu'); let btn=document.querySelector('.dot-menu'); if(m && m.style.display==='block' && !m.contains(e.target) && !btn.contains(e.target)){m.style.display='none';}});
@@ -158,19 +165,22 @@ let ll=document.getElementById('logoLogin'); if(setting.logo){ll.src=setting.log
 updateTokoUI();
 function pilihWarna(w){document.getElementById('inputWarna').value=w;document.getElementById('inputWarnaText').value=w;previewWarna(w);}
 function previewWarna(w){if(!w.startsWith('#'))w='#'+w;document.getElementById('inputWarnaText').value=w;try{document.getElementById('inputWarna').value=w;}catch(e){}applyWarna(w);}
-function uploadLogo(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=function(ev){document.getElementById('inputLogo').value=ev.target.result; let p=document.getElementById('previewLogo'); p.src=ev.target.result; p.classList.add('show'); alert('Foto logo dipilih! Jangan lupa klik Simpan Pengaturan');}; r.readAsDataURL(f);}
-function uploadBanner(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=function(ev){document.getElementById('inputBannerImg').value=ev.target.result; let p=document.getElementById('previewBanner'); p.src=ev.target.result; p.classList.add('show'); alert('Foto banner dipilih! Jangan lupa klik Simpan Pengaturan');}; r.readAsDataURL(f);}
+function uploadLogo(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=function(ev){document.getElementById('inputLogo').value=ev.target.result; let p=document.getElementById('previewLogo'); p.src=ev.target.result; p.classList.add('show');}; r.readAsDataURL(f);}
+function uploadBanner(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=function(ev){document.getElementById('inputBannerImg').value=ev.target.result; let p=document.getElementById('previewBanner'); p.src=ev.target.result; p.classList.add('show');}; r.readAsDataURL(f);}
 function previewLogoLink(v){let p=document.getElementById('previewLogo'); if(v){p.src=v; p.classList.add('show');} else p.classList.remove('show');}
 function previewBannerLink(v){let p=document.getElementById('previewBanner'); if(v){p.src=v; p.classList.add('show');} else p.classList.remove('show');}
-function hapusLogo(){document.getElementById('inputLogo').value=''; document.getElementById('previewLogo').classList.remove('show'); setting.logo=''; save(); updateTokoUI(); alert('Logo dihapus');}
-function hapusBanner(){document.getElementById('inputBannerImg').value=''; document.getElementById('previewBanner').classList.remove('show'); setting.bannerImg=''; save(); updateTokoUI(); alert('Banner dihapus');}
+function hapusLogo(){document.getElementById('inputLogo').value=''; document.getElementById('previewLogo').classList.remove('show'); setting.logo=''; save(); updateTokoUI();}
+function hapusBanner(){document.getElementById('inputBannerImg').value=''; document.getElementById('previewBanner').classList.remove('show'); setting.bannerImg=''; save(); updateTokoUI();}
+function showToast(p){let t=document.getElementById('shopeeToast'); document.getElementById('toastImg').src=p.img; document.getElementById('toastText').innerText='✅ '+p.nama+' ditambah!'; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>{t.classList.remove('show')},2500);}
+function hideToast(){document.getElementById('shopeeToast').classList.remove('show');}
+function bumpCart(){let b=document.getElementById('jumlahCart'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');}
 function tampilkanProduk(){let cari=document.getElementById('cari').value.toLowerCase();let f=document.getElementById('filterHarga').value;let list=products.filter(p=>p.nama.toLowerCase().includes(cari));if(f=='murah')list=list.filter(p=>p.harga<200000);if(f=='mahal')list=list.filter(p=>p.harga>=200000);document.getElementById('listProduk').innerHTML=list.map(p=>`<div class="col-md-4 mb-3"><div class="card h-100"><img src="${p.img}" onerror="this.src='https://via.placeholder.com/500'"><div class="card-body"><h5>${p.nama}</h5><p>${p.desc}</p><p><span class="badge bg-secondary">Stok: ${p.stok||0}</span></p><h6>${formatRupiah(p.harga)}</h6><div class="d-flex gap-1"><input type="number" value="1" min="1" id="qty-${p.id}" class="form-control" style="width:70px"><button class="btn btn-primary flex-fill" onclick="tambah(${p.id})">+ Keranjang</button></div></div></div></div>`).join('')||'<p class="text-center">Produk tidak ditemukan</p>';tampilkanCart();}
-function tambah(id){let qty=parseInt(document.getElementById('qty-'+id).value)||1;let item=cart.find(x=>x.id===id);if(item)item.qty+=qty;else{let p=products.find(x=>x.id===id);cart.push({...p,qty})}save();tampilkanCart();alert('Ditambah ke keranjang!');}
+function tambah(id){let qty=parseInt(document.getElementById('qty-'+id).value)||1;let item=cart.find(x=>x.id===id);if(item)item.qty+=qty;else{let p=products.find(x=>x.id===id);cart.push({...p,qty})}save();tampilkanCart();let p=products.find(x=>x.id===id);showToast(p);bumpCart();}
 function tampilkanCart(){document.getElementById('jumlahCart').innerText=cart.reduce((a,b)=>a+b.qty,0);let total=cart.reduce((a,b)=>a+b.harga*b.qty,0);document.getElementById('totalHarga').innerText=formatRupiah(total);if(cart.length==0){document.getElementById('cartList').innerHTML='<li class="list-group-item">Keranjang masih kosong</li>';return}document.getElementById('cartList').innerHTML=cart.map((c,i)=>`<li class="list-group-item d-flex justify-content-between align-items-center">${c.nama} <span><button class="btn btn-sm btn-outline-secondary" onclick="ubahQty(${i},-1)">-</button> ${c.qty} <button class="btn btn-sm btn-outline-secondary" onclick="ubahQty(${i},1)">+</button> <b>${formatRupiah(c.harga*c.qty)}</b> <button class="btn btn-sm btn-danger" onclick="hapusItem(${i})">x</button></span></li>`).join('');}
 function ubahQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);save();tampilkanCart();}
 function hapusItem(i){cart.splice(i,1);save();tampilkanCart();}
 function hapusCart(){cart=[];save();tampilkanCart();}
-function scrollCart(){document.getElementById('cartSection').scrollIntoView({behavior:'smooth'})}
+function scrollCart(){document.getElementById('cartSection').scrollIntoView({behavior:'smooth'});hideToast();}
 function checkoutWA(){if(cart.length==0){alert('Keranjang kosong!');return}let nama=document.getElementById('namaPembeli').value||'Tanpa Nama';let alamat=document.getElementById('alamatPembeli').value||'-';let total=cart.reduce((a,b)=>a+b.harga*b.qty,0);let order={id:Date.now(),nama,alamat,items:[...cart],total,tanggal:new Date().toLocaleString('id-ID')};orders.unshift(order);cart=[];save();tampilkanCart();updateDashboard();let pesan=`Halo ${setting.nama}, saya ${nama} mau pesan:\nAlamat: ${alamat}\n`;order.items.forEach(c=>pesan+=`- ${c.nama} x ${c.qty} = ${formatRupiah(c.harga*c.qty)}\n`);pesan+=`Total: ${formatRupiah(total)}`;window.open(`https://wa.me/${setting.wa}?text=`+encodeURIComponent(pesan),'_blank');}
 function bukaDashboardLogin(){document.getElementById('dotMenu').style.display='none';document.getElementById('halamanToko').style.display='none';document.getElementById('halamanLogin').style.display='block';document.getElementById('halamanDashboard').style.display='none';window.scrollTo(0,0);}
 function kembaliKeToko(){document.getElementById('halamanToko').style.display='block';document.getElementById('halamanLogin').style.display='none';document.getElementById('halamanDashboard').style.display='none';tampilkanProduk();}
@@ -178,14 +188,14 @@ function cekLogin(){let u=document.getElementById('loginUser').value.trim();let 
 function logoutAdmin(){document.getElementById('halamanDashboard').style.display='none';kembaliKeToko();}
 function showTab(id,el){['tabHome','tabProduk','tabPesanan','tabSetting','tabAkun'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));if(el)el.classList.add('active');}
 function updateDashboard(){document.getElementById('statProduk').innerText=products.length;document.getElementById('statPesanan').innerText=orders.length;document.getElementById('statOmset').innerText=formatRupiah(orders.reduce((a,b)=>a+b.total,0));document.getElementById('statKunjung').innerText=kunjungan;document.getElementById('topProduk').innerHTML=products.slice(0,3).map(p=>`<div class="d-flex justify-content-between border-bottom py-2">${p.nama} <b>${formatRupiah(p.harga)}</b></div>`).join('');document.getElementById('recentOrder').innerHTML=orders.slice(0,5).map(o=>`<div class="border p-2 mb-2 rounded"><b>${o.nama}</b> - ${formatRupiah(o.total)} <br><small>${o.tanggal} - ${o.alamat}</small></div>`).join('')||'Belum ada pesanan';}
-function simpanProduk(){let id=document.getElementById('editId').value;let nama=document.getElementById('pNama').value,harga=parseInt(document.getElementById('pHarga').value),img=document.getElementById('pGambar').value,desc=document.getElementById('pDesc').value,stok=parseInt(document.getElementById('pStok').value)||0;if(!nama||!harga){alert('Nama & Harga wajib diisi!');return}if(id){let p=products.find(x=>x.id==id);p.nama=nama;p.harga=harga;p.img=img||p.img;p.desc=desc;p.stok=stok;}else{products.push({id:Date.now(),nama,harga,img:img||'https://via.placeholder.com/500',desc,stok})}document.getElementById('editId').value='';document.getElementById('pNama').value='';document.getElementById('pHarga').value='';document.getElementById('pGambar').value='';document.getElementById('pDesc').value='';document.getElementById('pStok').value='';save();tampilkanProduk();tampilkanAdminList();updateDashboard();alert('Produk tersimpan!');}
+function simpanProduk(){let id=document.getElementById('editId').value;let nama=document.getElementById('pNama').value,harga=parseInt(document.getElementById('pHarga').value),img=document.getElementById('pGambar').value,desc=document.getElementById('pDesc').value,stok=parseInt(document.getElementById('pStok').value)||0;if(!nama||!harga){alert('Nama & Harga wajib diisi!');return}if(id){let p=products.find(x=>x.id==id);p.nama=nama;p.harga=harga;p.img=img||p.img;p.desc=desc;p.stok=stok;}else{products.push({id:Date.now(),nama,harga,img:img||'https://via.placeholder.com/500',desc,stok})}document.getElementById('editId').value='';document.getElementById('pNama').value='';document.getElementById('pHarga').value='';document.getElementById('pGambar').value='';document.getElementById('pDesc').value='';document.getElementById('pStok').value='';save();tampilkanProduk();tampilkanAdminList();updateDashboard();}
 function tampilkanAdminList(){document.getElementById('listAdminProduk').innerHTML=products.map(p=>`<div class="d-flex justify-content-between align-items-center border p-2 mb-1 bg-white rounded"><div><img src="${p.img}" style="width:50px;height:50px;object-fit:cover;border-radius:8px"> ${p.nama} - ${formatRupiah(p.harga)} (Stok ${p.stok||0})</div><span><button class="btn btn-sm btn-warning" onclick="editProduk(${p.id})">Edit</button> <button class="btn btn-sm btn-danger" onclick="hapusProduk(${p.id})">Hapus</button></span></div>`).join('');}
 function editProduk(id){let p=products.find(x=>x.id==id);document.getElementById('editId').value=p.id;document.getElementById('pNama').value=p.nama;document.getElementById('pHarga').value=p.harga;document.getElementById('pGambar').value=p.img;document.getElementById('pDesc').value=p.desc;document.getElementById('pStok').value=p.stok;window.scrollTo(0,0);}
 function hapusProduk(id){if(confirm('Hapus produk ini?')){products=products.filter(x=>x.id!=id);save();tampilkanProduk();tampilkanAdminList();updateDashboard();}}
 function tampilkanPesanan(){document.getElementById('listPesanan').innerHTML=orders.map(o=>`<div class="card p-3 mb-2"><b>${o.nama} - ${formatRupiah(o.total)}</b><small>${o.tanggal} | ${o.alamat}</small><ul>${o.items.map(i=>`<li>${i.nama} x ${i.qty}</li>`).join('')}</ul></div>`).join('')||'Belum ada pesanan';}
 function hapusSemuaPesanan(){if(confirm('Hapus semua pesanan?')){orders=[];save();tampilkanPesanan();updateDashboard();}}
 function isiSettingForm(){document.getElementById('inputNamaToko').value=setting.nama;document.getElementById('inputDescToko').value=setting.desc;document.getElementById('inputBanner').value=setting.banner;document.getElementById('inputWA').value=setting.wa;document.getElementById('inputWarna').value=setting.warna||'#FF5DA2';document.getElementById('inputWarnaText').value=setting.warna||'#FF5DA2';document.getElementById('inputLogo').value=setting.logo||'';document.getElementById('inputBannerImg').value=setting.bannerImg||'';let pl=document.getElementById('previewLogo'); if(setting.logo){pl.src=setting.logo; pl.classList.add('show');} let pb=document.getElementById('previewBanner'); if(setting.bannerImg){pb.src=setting.bannerImg; pb.classList.add('show');}}
-function simpanSetting(){setting.nama=document.getElementById('inputNamaToko').value||setting.nama;setting.desc=document.getElementById('inputDescToko').value||setting.desc;setting.banner=document.getElementById('inputBanner').value||setting.banner;setting.wa=document.getElementById('inputWA').value||setting.wa;setting.warna=document.getElementById('inputWarnaText').value||document.getElementById('inputWarna').value||setting.warna;setting.logo=document.getElementById('inputLogo').value||setting.logo;setting.bannerImg=document.getElementById('inputBannerImg').value||setting.bannerImg;save();updateTokoUI();alert('Pengaturan tersimpan! Foto + Warna udah berubah.');}
+function simpanSetting(){setting.nama=document.getElementById('inputNamaToko').value||setting.nama;setting.desc=document.getElementById('inputDescToko').value||setting.desc;setting.banner=document.getElementById('inputBanner').value||setting.banner;setting.wa=document.getElementById('inputWA').value||setting.wa;setting.warna=document.getElementById('inputWarnaText').value||document.getElementById('inputWarna').value||setting.warna;setting.logo=document.getElementById('inputLogo').value||setting.logo;setting.bannerImg=document.getElementById('inputBannerImg').value||setting.bannerImg;save();updateTokoUI();}
 function gantiAkun(){let u=document.getElementById('newUser').value.trim();let p=document.getElementById('newPass').value.trim();if(!u||!p){alert('Isi username & password baru!');return}akun={user:u,pass:p};save();alert('Akun berhasil diganti! Login baru: '+u+' / '+p);}
 function resetToko(){if(confirm('Reset semua?')){localStorage.clear();location.reload();}}
 tampilkanProduk();updateDashboard();
