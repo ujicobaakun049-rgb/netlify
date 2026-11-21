@@ -40,6 +40,93 @@ body{background:#f1f3f5}
 .save-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .btn-saved{background:#198754!important;color:#fff!important}
 .sync-badge{font-size:12px;background:#198754;color:#fff;padding:3px 8px;border-radius:20px}
+  /* === TAMPILAN PRODUK ALA SHOPEE === */
+#productList, .product-grid, .products, #products {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 10px !important;
+  padding: 10px !important;
+  background: #f0f0f0 !important;
+}
+
+.product-card, .product, .card {
+  background: white !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  padding: 0 0 10px 0 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* FOTO PRODUK - kotak kayak Shopee */
+.product-card img, .product img, .card img {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+}
+
+/* NAMA + DESKRIPSI PRODUK */
+.product-card h3, .product h3, .card h3 {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #222 !important;
+  line-height: 1.3 !important;
+  padding: 8px 8px 2px 8px !important;
+  margin: 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  min-height: 34px !important;
+}
+
+.product-card p, .product p {
+  font-size: 12px !important;
+  color: #666 !important;
+  padding: 0 8px !important;
+  margin: 2px 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* LABEL HARGA - BIRU 🔵 SESUAI REQUEST LU */
+.price, .product-price, .product-card .harga {
+  color: #1E3A8A !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  padding: 4px 8px 0 8px !important;
+  margin: 0 !important;
+}
+
+/* TOMBOL TAMBAH BIAR RAPI */
+.product-card button, .product button {
+  margin: 8px 8px 0 8px !important;
+  background: #1E3A8A !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+  /* === UBAH TOMBOL PINK JADI BIRU === */
+button[onclick*="lihatKeranjang"],
+.toast button, #toast button,
+.notif button, .toast-btn {
+  background: #1E3A8A !important;
+  color: white !important;
+}
+
+/* Paksa semua sisa warna pink jadi biru */
+[style*="#FF5DA2"] {
+  background-color: #1E3A8A !important;
+}
 </style>
 </head>
 <body>
@@ -55,7 +142,7 @@ body{background:#f1f3f5}
 <div style="padding:15px 10px 0">
 <h1 id="namaToko" onclick="klikNamaToko()" style="cursor:pointer;user-select:none;margin-top:10px">RGB STORE</h1>
 <p id="descToko">Toko Online Murah, Cepat & Terpercaya</p>
-<button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang (<span id="jumlahCart" class="cart-badge" style="display:inline-block">0</span>)</button>
+<button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang <span id="jumlahCart" class="cart-badge" style="display:inline-block">0</span>)</button>
 <div class="mt-2"><span id="syncStatus" class="sync-badge" style="display:none;">☁️ Sinkron JSONBin</span></div>
 </div>
 </div>
@@ -131,7 +218,7 @@ body{background:#f1f3f5}
 <img id="previewBanner" class="preview-img" src="">
 <button class="btn btn-sm btn-outline-danger mt-1 mb-3" onclick="hapusBanner()">Hapus Banner</button>
 <hr><label>🎨 Warna Toko & Dashboard</label>
-<div class="color-row mb-2"><input type="color" id="inputWarna" value="#FF5DA2" oninput="previewWarna(this.value)"><input id="inputWarnaText" class="form-control" value="#FF5DA2" oninput="previewWarna(this.value)"><button class="btn btn-outline-dark" onclick="previewWarna(document.getElementById('inputWarna').value)">Lihat</button></div>
+<div class="color-row mb-2"><input type="color" id="inputWarna" value="#1E3A8A" oninput="previewWarna(this.value)"><input id="inputWarnaText" class="form-control" value="#FF5DA2" oninput="previewWarna(this.value)"><button class="btn btn-outline-dark" onclick="previewWarna(document.getElementById('inputWarna').value)">Lihat</button></div>
 <div class="d-flex gap-2 flex-wrap mb-2">
 <button class="preset-btn" style="background:#FF5DA2" onclick="pilihWarna('#FF5DA2')"></button>
 <button class="preset-btn" style="background:#14B8A6" onclick="pilihWarna('#14B8A6')"></button>
