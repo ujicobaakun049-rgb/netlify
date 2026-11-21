@@ -1,9 +1,11 @@
+const BIN_ID = "6b00d9efac6210605a98a23f";
+const API_KEY = "$2a$10$GNSSrjTZC5D2YPVXwUv9PePMxu0yQS.d4RiR7c4VsiEM00A4Blqy6";
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CikiCuy</title>
+<title>RGB STORE</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
 body{background:#f1f3f5}
@@ -39,6 +41,7 @@ body{background:#f1f3f5}
 .save-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#198754;color:#fff;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:10px;z-index:100000;box-shadow:0 8px 25px rgba(0,0,0,0.35);opacity:0;transition:all 0.3s;font-size:15px;font-weight:bold;max-width:92%}
 .save-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .btn-saved{background:#198754!important;color:#fff!important}
+.sync-badge{font-size:12px;background:#198754;color:#fff;padding:3px 8px;border-radius:20px}
 </style>
 </head>
 <body>
@@ -52,9 +55,10 @@ body{background:#f1f3f5}
 <img id="bannerImgToko" class="hero-banner" src="">
 <img id="logoImgToko" class="hero-logo" src="">
 <div style="padding:15px 10px 0">
-<h1 id="namaToko" onclick="klikNamaToko()" style="cursor:pointer;user-select:none;margin-top:10px">CikiCuy</h1>
+<h1 id="namaToko" onclick="klikNamaToko()" style="cursor:pointer;user-select:none;margin-top:10px">RGB STORE</h1>
 <p id="descToko">Toko Online Murah, Cepat & Terpercaya</p>
 <button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang (<span id="jumlahCart" class="cart-badge" style="display:inline-block">0</span>)</button>
+<div class="mt-2"><span id="syncStatus" class="sync-badge">☁️ Sinkron JSONBin</span></div>
 </div>
 </div>
 <div class="container my-4">
@@ -63,7 +67,7 @@ body{background:#f1f3f5}
 <div class="col"><input id="cari" class="form-control" placeholder="🔍 Cari produk..." oninput="tampilkanProduk()"></div>
 <div class="col-auto"><select id="filterHarga" class="form-select" onchange="tampilkanProduk()"><option value="semua">Semua Harga</option><option value="murah">Dibawah 200rb</option><option value="mahal">Diatas 200rb</option></select></div>
 </div>
-<div class="row" id="listProduk"></div>
+<div class="row" id="listProduk"><p class="text-center">⏳ Memuat produk dari JSONBin...</p></div>
 </div>
 <div class="container mb-5" id="cartSection">
 <h3>Keranjang Belanja</h3>
@@ -93,7 +97,7 @@ body{background:#f1f3f5}
 <div class="row g-0">
 <div class="col-md-3 sidebar" id="sidebarAdmin">
 <img id="logoSidebar" class="sidebar-logo" src="">
-<h3>📊 CikiCuy ADMIN</h3><p>Selamat datang, <b id="namaAdmin">admin</b></p>
+<h3>📊 RGB STORE ADMIN</h3><p>Selamat datang, <b id="namaAdmin">admin</b></p><p><span class="badge bg-success">☁️ JSONBin Online</span></p>
 <a href="#" class="active" onclick="showTab('tabHome',this)">🏠 Dashboard</a>
 <a href="#" onclick="showTab('tabProduk',this)">📦 Produk</a>
 <a href="#" onclick="showTab('tabPesanan',this)">🧾 Pesanan</a>
@@ -103,7 +107,7 @@ body{background:#f1f3f5}
 <button class="btn btn-light w-100 mt-2" onclick="kembaliKeToko()">🛍️ Lihat Toko</button>
 </div>
 <div class="col-md-9 p-4">
-<div id="tabHome"><h2>Dashboard</h2><p class="text-muted">Ringkasan toko kamu</p>
+<div id="tabHome"><h2>Dashboard</h2><p class="text-muted">Data dari JSONBin - Sama di semua HP</p>
 <div class="row">
 <div class="col-md-3 mb-3"><div class="stat-card bg-primary"><h6>📦 Total Produk</h6><h2 id="statProduk">0</h2></div></div>
 <div class="col-md-3 mb-3"><div class="stat-card bg-success"><h6>🧾 Total Pesanan</h6><h2 id="statPesanan">0</h2></div></div>
@@ -112,10 +116,10 @@ body{background:#f1f3f5}
 </div>
 <div class="card p-3"><h5>🔥 Produk</h5><div id="topProduk"></div></div>
 <div class="card p-3 mt-3"><h5>🧾 5 Pesanan Terakhir</h5><div id="recentOrder"></div></div></div>
-<div id="tabProduk" style="display:none"><h2>Kelola Produk</h2><div class="card p-3 mb-3">
+<div id="tabProduk" style="display:none"><h2>Kelola Produk</h2><p class="text-muted small">Nambah di sini = langsung muncul di HP lu & HP pembeli. Gak usah ke GitHub lagi.</p><div class="card p-3 mb-3">
 <input type="hidden" id="editId">
-<div class="row"><div class="col-md-6"><input id="pNama" class="form-control mb-2" placeholder="Nama Produk"></div><div class="col-md-6"><input id="pHarga" type="number" class="form-control mb-2" placeholder="Harga contoh 150000"></div><div class="col-md-6"><input id="pGambar" class="form-control mb-2" placeholder="Link Gambar https://..."></div><div class="col-md-6"><input id="pStok" type="number" class="form-control mb-2" placeholder="Stok contoh 10"></div><div class="col-md-6"><select id="pFit" class="form-select mb-2"><option value="contain">🖼️ Foto Pas - Keliatan Semua (Gak Kepotong)</option><option value="cover">🔥 Foto Full - Nge-full Kayak Shopee (Bisa Kepotong Dikit)</option><option value="fill">↔️ Foto Melar - Dipaksa Pas Kotak</option></select></div><div class="col-md-6"><small class="text-muted">Pilih cara foto tampil di toko. Roti Aoka pilih Foto Pas, Sepatu pilih Foto Full.</small></div><div class="col-12"><textarea id="pDesc" class="form-control mb-2" placeholder="Deskripsi Produk"></textarea></div></div>
-<button class="btn btn-success w-100" id="btnSimpanProduk" onclick="simpanProduk()">💾 Simpan Produk</button></div><div id="listAdminProduk"></div></div>
+<div class="row"><div class="col-md-6"><input id="pNama" class="form-control mb-2" placeholder="Nama Produk - contoh: Roti Aoka"></div><div class="col-md-6"><input id="pHarga" type="number" class="form-control mb-2" placeholder="Harga contoh 15000"></div><div class="col-md-6"><input id="pGambar" class="form-control mb-2" placeholder="Link Gambar https://..."></div><div class="col-md-6"><input id="pStok" type="number" class="form-control mb-2" placeholder="Stok contoh 10"></div><div class="col-md-6"><select id="pFit" class="form-select mb-2"><option value="contain">🖼️ Foto Pas - Keliatan Semua (Gak Kepotong)</option><option value="cover">🔥 Foto Full - Nge-full Kayak Shopee (Bisa Kepotong Dikit)</option><option value="fill">↔️ Foto Melar - Dipaksa Pas Kotak</option></select></div><div class="col-md-6"><small class="text-muted">Roti / makanan pilih Foto Pas, Sepatu / baju pilih Foto Full.</small></div><div class="col-12"><textarea id="pDesc" class="form-control mb-2" placeholder="Deskripsi Produk"></textarea></div></div>
+<button class="btn btn-success w-100" id="btnSimpanProduk" onclick="simpanProduk()">💾 Simpan Produk - Langsung Muncul Di Semua HP</button></div><div id="listAdminProduk"></div></div>
 <div id="tabPesanan" style="display:none"><h2>Daftar Pesanan</h2><div id="listPesanan"></div><button class="btn btn-danger" onclick="hapusSemuaPesanan()">Hapus Semua Pesanan</button></div>
 <div id="tabSetting" style="display:none"><h2>Pengaturan Toko</h2><div class="card p-3"><label>Nama Toko</label><input id="inputNamaToko" class="form-control mb-2"><label>Deskripsi Toko</label><input id="inputDescToko" class="form-control mb-2"><label>Banner Promo (Tulisan)</label><input id="inputBanner" class="form-control mb-2"><label>No WA (contoh 62812...)</label><input id="inputWA" class="form-control mb-2">
 <hr><h5>🖼️ Foto Logo / Foto Profil Toko</h5>
@@ -138,25 +142,54 @@ body{background:#f1f3f5}
 <button class="preset-btn" style="background:#F97316" onclick="pilihWarna('#F97316')"></button>
 <button class="preset-btn" style="background:#111111" onclick="pilihWarna('#111111')"></button>
 </div>
-<button class="btn btn-warning w-100" id="btnSimpanSetting" onclick="simpanSetting()">Simpan Pengaturan</button></div></div>
+<button class="btn btn-warning w-100" id="btnSimpanSetting" onclick="simpanSetting()">Simpan Pengaturan - Langsung Muncul Di Semua HP</button></div></div>
 <div id="tabAkun" style="display:none"><h2>Ganti Akun Admin</h2><div class="card p-3"><label>Username Baru</label><input id="newUser" class="form-control mb-2"><label>Password Baru</label><input id="newPass" class="form-control mb-2" placeholder="Minimal 4 karakter"><button class="btn btn-dark w-100" onclick="gantiAkun()">Ganti Username & Password</button><button class="btn btn-outline-danger w-100 mt-2" onclick="resetToko()">Reset Toko Ke Awal</button></div></div>
 </div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-let defaultProduk=[{id:1,nama:"Sepatu Sneakers",harga:250000,stok:10,fit:"cover",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",desc:"Sepatu keren nyaman dipakai"},{id:2,nama:"Hoodie Hitam",harga:180000,stok:15,fit:"cover",img:"https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500",desc:"Hoodie tebal premium"},{id:3,nama:"Jam Tangan",harga:350000,stok:8,fit:"cover",img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Jam stylish"},{id:4,nama:"Tas Ransel",harga:220000,stok:12,fit:"cover",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500",desc:"Tas muat laptop"},{id:5,nama:"Headphone",harga:400000,stok:5,fit:"cover",img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Bass nendang"},{id:6,nama:"Kacamata",harga:120000,stok:20,fit:"cover",img:"https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500",desc:"Anti radiasi"}];
-let products=JSON.parse(localStorage.getItem('myProduk')||'null')||defaultProduk;
+// ===== GANTI 2 BARIS INI DOANG - JSONBIN =====
+const BIN_ID = "GANTI_BIN_ID_LU";
+const API_KEY = "GANTI_API_KEY_LU";
+const API_URL = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+// ====================================
+let products=[];
 let cart=JSON.parse(localStorage.getItem('myCart')||'[]');
-let orders=JSON.parse(localStorage.getItem('myOrders')||'[]');
-let setting=JSON.parse(localStorage.getItem('mySetting')||'{"nama":"CikiCuy","wa":"6281234567890","desc":"Toko Online Murah, Cepat & Terpercaya","banner":"🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!","warna":"#FF5DA2","logo":"","bannerImg":""}');
-setting.wa="6285178360714";
-if(!setting.warna) setting.warna='#FF5DA2'; if(setting.logo===undefined) setting.logo=''; if(setting.bannerImg===undefined) setting.bannerImg='';
-let akun=JSON.parse(localStorage.getItem('myAkun')||'{"user":"admin","pass":"admin123"}');
+let orders=[];
+let setting={"nama":"RGB STORE","wa":"6281234567890","desc":"Toko Online Murah, Cepat & Terpercaya","banner":"🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!","warna":"#FF5DA2","logo":"","bannerImg":""};
+let akun={"user":"admin","pass":"admin123"};
 let kunjungan=parseInt(localStorage.getItem('myKunjung')||'0')+1; localStorage.setItem('myKunjung',kunjungan);
-let klikNama=0; let klikTimer=null; let toastTimer=null; let saveToastTimer=null;
+let klikNama=0; let klikTimer=null; let toastTimer=null; let saveToastTimer=null; let isSaving=false;
+async function loadDariCloud(){
+  try{
+    document.getElementById('syncStatus').innerText='⏳ Memuat dari JSONBin...';
+    let res=await fetch(API_URL,{headers:{"X-Master-Key":API_KEY}});
+    let j=await res.json();
+    let d=j.record||j;
+    if(d.products) products=d.products;
+    if(d.setting) setting=d.setting;
+    if(d.orders) orders=d.orders;
+    if(d.akun) akun=d.akun;
+    document.getElementById('syncStatus').innerText='☁️ Sinkron JSONBin';
+  }catch(e){
+    document.getElementById('syncStatus').innerText='⚠️ Offline - Cek BIN ID / API KEY';
+  }
+  updateTokoUI(); tampilkanProduk(); updateDashboard();
+}
+async function saveKeCloud(){
+  if(isSaving) return; isSaving=true;
+  document.getElementById('syncStatus').innerText='⏳ Menyimpan ke JSONBin...';
+  try{
+    await fetch(API_URL,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":API_KEY},body:JSON.stringify({products,setting,orders,akun})});
+    document.getElementById('syncStatus').innerText='☁️ Sinkron JSONBin - Udah Keubah Di Semua HP';
+  }catch(e){
+    document.getElementById('syncStatus').innerText='⚠️ Gagal Simpan - Cek Internet';
+  }
+  isSaving=false;
+}
+function saveLocalCart(){localStorage.setItem('myCart',JSON.stringify(cart));}
 function toggleDotMenu(){let m=document.getElementById('dotMenu'); m.style.display=(m.style.display==='block'?'none':'block');}
 function klikNamaToko(){klikNama++; clearTimeout(klikTimer); klikTimer=setTimeout(()=>{klikNama=0},1500); if(klikNama>=5){klikNama=0; bukaDashboardLogin();}}
 document.addEventListener('click',function(e){let m=document.getElementById('dotMenu'); let btn=document.querySelector('.dot-menu'); if(m && m.style.display==='block' && !m.contains(e.target) && !btn.contains(e.target)){m.style.display='none';}});
-function save(){localStorage.setItem('myProduk',JSON.stringify(products));localStorage.setItem('myCart',JSON.stringify(cart));localStorage.setItem('mySetting',JSON.stringify(setting));localStorage.setItem('myOrders',JSON.stringify(orders));localStorage.setItem('myAkun',JSON.stringify(akun));}
 function formatRupiah(n){return 'Rp '+n.toLocaleString('id-ID')}
 function isWarnaTerang(hex){hex=hex.replace('#','');let r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);let lum=(0.299*r+0.587*g+0.114*b)/255;return lum>0.7;}
 function applyWarna(warna){let hero=document.getElementById('heroToko');let side=document.getElementById('sidebarAdmin');if(hero)hero.style.background=warna;if(side)side.style.background=warna;let terang=isWarnaTerang(warna);let txt=terang?'#111':'#fff';if(hero)hero.style.color=txt;if(side)side.style.color=txt;if(side){side.querySelectorAll('a').forEach(a=>a.style.color=txt)}}
@@ -166,44 +199,43 @@ let l=document.getElementById('logoImgToko'); if(setting.logo){l.src=setting.log
 let ls=document.getElementById('logoSidebar'); if(setting.logo){ls.src=setting.logo; ls.classList.add('show');} else {ls.classList.remove('show');}
 let ll=document.getElementById('logoLogin'); if(setting.logo){ll.src=setting.logo; ll.style.display='block';} else {ll.style.display='none';}
 }
-updateTokoUI();
 function pilihWarna(w){document.getElementById('inputWarna').value=w;document.getElementById('inputWarnaText').value=w;previewWarna(w);}
 function previewWarna(w){if(!w.startsWith('#'))w='#'+w;document.getElementById('inputWarnaText').value=w;try{document.getElementById('inputWarna').value=w;}catch(e){}applyWarna(w);}
 function uploadLogo(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=function(ev){document.getElementById('inputLogo').value=ev.target.result; let p=document.getElementById('previewLogo'); p.src=ev.target.result; p.classList.add('show');}; r.readAsDataURL(f);}
 function uploadBanner(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=function(ev){document.getElementById('inputBannerImg').value=ev.target.result; let p=document.getElementById('previewBanner'); p.src=ev.target.result; p.classList.add('show');}; r.readAsDataURL(f);}
 function previewLogoLink(v){let p=document.getElementById('previewLogo'); if(v){p.src=v; p.classList.add('show');} else p.classList.remove('show');}
 function previewBannerLink(v){let p=document.getElementById('previewBanner'); if(v){p.src=v; p.classList.add('show');} else p.classList.remove('show');}
-function hapusLogo(){document.getElementById('inputLogo').value=''; document.getElementById('previewLogo').classList.remove('show'); setting.logo=''; save(); updateTokoUI(); showSaveToast('✅ Logo Dihapus!');}
-function hapusBanner(){document.getElementById('inputBannerImg').value=''; document.getElementById('previewBanner').classList.remove('show'); setting.bannerImg=''; save(); updateTokoUI(); showSaveToast('✅ Banner Dihapus!');}
+async function hapusLogo(){document.getElementById('inputLogo').value=''; document.getElementById('previewLogo').classList.remove('show'); setting.logo=''; await saveKeCloud(); updateTokoUI(); showSaveToast('✅ Logo Dihapus!');}
+async function hapusBanner(){document.getElementById('inputBannerImg').value=''; document.getElementById('previewBanner').classList.remove('show'); setting.bannerImg=''; await saveKeCloud(); updateTokoUI(); showSaveToast('✅ Banner Dihapus!');}
 function showToast(p){let t=document.getElementById('shopeeToast'); document.getElementById('toastImg').src=p.img; document.getElementById('toastText').innerText='✅ '+p.nama+' ditambah!'; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>{t.classList.remove('show')},2500);}
 function hideToast(){document.getElementById('shopeeToast').classList.remove('show');}
 function showSaveToast(pesan){let t=document.getElementById('saveToast'); document.getElementById('saveToastText').innerText=pesan||'Berhasil Disimpan!'; t.classList.add('show'); clearTimeout(saveToastTimer); saveToastTimer=setTimeout(()=>{t.classList.remove('show')},2500);}
 function bumpCart(){let b=document.getElementById('jumlahCart'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');}
-function tampilkanProduk(){let cari=document.getElementById('cari').value.toLowerCase();let f=document.getElementById('filterHarga').value;let list=products.filter(p=>p.nama.toLowerCase().includes(cari));if(f=='murah')list=list.filter(p=>p.harga<200000);if(f=='mahal')list=list.filter(p=>p.harga>=200000);document.getElementById('listProduk').innerHTML=list.map(p=>`<div class="col-md-4 mb-3"><div class="card h-100"><img src="${p.img}" style="object-fit:${p.fit||'contain'}" onerror="this.src='https://via.placeholder.com/500'"><div class="card-body"><h5>${p.nama}</h5><p>${p.desc}</p><p><span class="badge bg-secondary">Stok: ${p.stok||0}</span></p><h6>${formatRupiah(p.harga)}</h6><div class="d-flex gap-1"><input type="number" value="1" min="1" id="qty-${p.id}" class="form-control" style="width:70px"><button class="btn btn-primary flex-fill" onclick="tambah(${p.id})">+ Keranjang</button></div></div></div></div>`).join('')||'<p class="text-center">Produk tidak ditemukan</p>';tampilkanCart();}
-function tambah(id){let qty=parseInt(document.getElementById('qty-'+id).value)||1;let item=cart.find(x=>x.id===id);if(item)item.qty+=qty;else{let p=products.find(x=>x.id===id);cart.push({...p,qty})}save();tampilkanCart();let p=products.find(x=>x.id===id);showToast(p);bumpCart();}
+function tampilkanProduk(){let cari=document.getElementById('cari').value.toLowerCase();let f=document.getElementById('filterHarga').value;let list=products.filter(p=>p.nama.toLowerCase().includes(cari));if(f=='murah')list=list.filter(p=>p.harga<200000);if(f=='mahal')list=list.filter(p=>p.harga>=200000);if(products.length==0){document.getElementById('listProduk').innerHTML='<div class="col-12 text-center py-5"><h4>🛍️ Toko Masih Kosong</h4><p>Admin belum nambah produk. Cek lagi nanti ya!</p></div>';}else{document.getElementById('listProduk').innerHTML=list.map(p=>`<div class="col-md-4 mb-3"><div class="card h-100"><img src="${p.img}" style="object-fit:${p.fit||'contain'}" onerror="this.src='https://via.placeholder.com/500'"><div class="card-body"><h5>${p.nama}</h5><p>${p.desc}</p><p><span class="badge bg-secondary">Stok: ${p.stok||0}</span></p><h6>${formatRupiah(p.harga)}</h6><div class="d-flex gap-1"><input type="number" value="1" min="1" id="qty-${p.id}" class="form-control" style="width:70px"><button class="btn btn-primary flex-fill" onclick="tambah(${p.id})">+ Keranjang</button></div></div></div></div>`).join('')||'<p class="text-center">Produk tidak ditemukan</p>';}tampilkanCart();}
+function tambah(id){let qty=parseInt(document.getElementById('qty-'+id).value)||1;let item=cart.find(x=>x.id===id);if(item)item.qty+=qty;else{let p=products.find(x=>x.id===id);cart.push({...p,qty})}saveLocalCart();tampilkanCart();let p=products.find(x=>x.id===id);showToast(p);bumpCart();}
 function tampilkanCart(){document.getElementById('jumlahCart').innerText=cart.reduce((a,b)=>a+b.qty,0);let total=cart.reduce((a,b)=>a+b.harga*b.qty,0);document.getElementById('totalHarga').innerText=formatRupiah(total);if(cart.length==0){document.getElementById('cartList').innerHTML='<li class="list-group-item">Keranjang masih kosong</li>';return}document.getElementById('cartList').innerHTML=cart.map((c,i)=>`<li class="list-group-item d-flex justify-content-between align-items-center">${c.nama} <span><button class="btn btn-sm btn-outline-secondary" onclick="ubahQty(${i},-1)">-</button> ${c.qty} <button class="btn btn-sm btn-outline-secondary" onclick="ubahQty(${i},1)">+</button> <b>${formatRupiah(c.harga*c.qty)}</b> <button class="btn btn-sm btn-danger" onclick="hapusItem(${i})">x</button></span></li>`).join('');}
-function ubahQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);save();tampilkanCart();}
-function hapusItem(i){cart.splice(i,1);save();tampilkanCart();}
-function hapusCart(){cart=[];save();tampilkanCart();}
+function ubahQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);saveLocalCart();tampilkanCart();}
+function hapusItem(i){cart.splice(i,1);saveLocalCart();tampilkanCart();}
+function hapusCart(){cart=[];saveLocalCart();tampilkanCart();}
 function scrollCart(){document.getElementById('cartSection').scrollIntoView({behavior:'smooth'});hideToast();}
-function checkoutWA(){if(cart.length==0){alert('Keranjang kosong!');return}let nama=document.getElementById('namaPembeli').value||'Tanpa Nama';let alamat=document.getElementById('alamatPembeli').value||'-';let total=cart.reduce((a,b)=>a+b.harga*b.qty,0);let order={id:Date.now(),nama,alamat,items:[...cart],total,tanggal:new Date().toLocaleString('id-ID')};orders.unshift(order);cart=[];save();tampilkanCart();updateDashboard();let pesan=`Halo ${setting.nama}, saya ${nama} mau pesan:\nAlamat: ${alamat}\n`;order.items.forEach(c=>pesan+=`- ${c.nama} x ${c.qty} = ${formatRupiah(c.harga*c.qty)}\n`);pesan+=`Total: ${formatRupiah(total)}`;window.open(`https://wa.me/${setting.wa}?text=`+encodeURIComponent(pesan),'_blank');}
+async function checkoutWA(){if(cart.length==0){alert('Keranjang kosong!');return}let nama=document.getElementById('namaPembeli').value||'Tanpa Nama';let alamat=document.getElementById('alamatPembeli').value||'-';let total=cart.reduce((a,b)=>a+b.harga*b.qty,0);let order={id:Date.now(),nama,alamat,items:[...cart],total,tanggal:new Date().toLocaleString('id-ID')};orders.unshift(order);cart=[];saveLocalCart();await saveKeCloud();tampilkanCart();updateDashboard();let pesan=`Halo ${setting.nama}, saya ${nama} mau pesan:\nAlamat: ${alamat}\n`;order.items.forEach(c=>pesan+=`- ${c.nama} x ${c.qty} = ${formatRupiah(c.harga*c.qty)}\n`);pesan+=`Total: ${formatRupiah(total)}`;window.open(`https://wa.me/${setting.wa}?text=`+encodeURIComponent(pesan),'_blank');}
 function bukaDashboardLogin(){document.getElementById('dotMenu').style.display='none';document.getElementById('halamanToko').style.display='none';document.getElementById('halamanLogin').style.display='block';document.getElementById('halamanDashboard').style.display='none';window.scrollTo(0,0);}
 function kembaliKeToko(){document.getElementById('halamanToko').style.display='block';document.getElementById('halamanLogin').style.display='none';document.getElementById('halamanDashboard').style.display='none';tampilkanProduk();}
 function cekLogin(){let u=document.getElementById('loginUser').value.trim();let p=document.getElementById('loginPass').value.trim();if((u===akun.user && p===akun.pass)||p==='1234'){document.getElementById('halamanLogin').style.display='none';document.getElementById('halamanDashboard').style.display='block';document.getElementById('namaAdmin').innerText=akun.user;updateDashboard();tampilkanAdminList();tampilkanPesanan();isiSettingForm();applyWarna(setting.warna);}else alert('Username / Password salah! Coba admin / admin123');}
 function logoutAdmin(){document.getElementById('halamanDashboard').style.display='none';kembaliKeToko();}
 function showTab(id,el){['tabHome','tabProduk','tabPesanan','tabSetting','tabAkun'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));if(el)el.classList.add('active');}
-function updateDashboard(){document.getElementById('statProduk').innerText=products.length;document.getElementById('statPesanan').innerText=orders.length;document.getElementById('statOmset').innerText=formatRupiah(orders.reduce((a,b)=>a+b.total,0));document.getElementById('statKunjung').innerText=kunjungan;document.getElementById('topProduk').innerHTML=products.slice(0,3).map(p=>`<div class="d-flex justify-content-between border-bottom py-2">${p.nama} <b>${formatRupiah(p.harga)}</b></div>`).join('');document.getElementById('recentOrder').innerHTML=orders.slice(0,5).map(o=>`<div class="border p-2 mb-2 rounded"><b>${o.nama}</b> - ${formatRupiah(o.total)} <br><small>${o.tanggal} - ${o.alamat}</small></div>`).join('')||'Belum ada pesanan';}
-function simpanProduk(){let id=document.getElementById('editId').value;let nama=document.getElementById('pNama').value,harga=parseInt(document.getElementById('pHarga').value),img=document.getElementById('pGambar').value,desc=document.getElementById('pDesc').value,stok=parseInt(document.getElementById('pStok').value)||0,fit=document.getElementById('pFit').value||'contain';if(!nama||!harga){alert('Nama & Harga wajib diisi!');return}if(id){let p=products.find(x=>x.id==id);p.nama=nama;p.harga=harga;p.img=img||p.img;p.desc=desc;p.stok=stok;p.fit=fit;}else{products.push({id:Date.now(),nama,harga,img:img||'https://via.placeholder.com/500',desc,stok,fit})}document.getElementById('editId').value='';document.getElementById('pNama').value='';document.getElementById('pHarga').value='';document.getElementById('pGambar').value='';document.getElementById('pDesc').value='';document.getElementById('pStok').value='';save();tampilkanProduk();tampilkanAdminList();updateDashboard();let btn=document.getElementById('btnSimpanProduk');let teksAwal=btn.innerText;btn.innerText='✅ Produk Tersimpan!';btn.classList.add('btn-saved');showSaveToast('✅ Produk '+nama+' Berhasil Disimpan!');setTimeout(()=>{btn.innerText=teksAwal;btn.classList.remove('btn-saved')},2000);}
-function tampilkanAdminList(){document.getElementById('listAdminProduk').innerHTML=products.map(p=>`<div class="d-flex justify-content-between align-items-center border p-2 mb-1 bg-white rounded"><div><img src="${p.img}" style="width:50px;height:50px;object-fit:cover;border-radius:8px"> ${p.nama} - ${formatRupiah(p.harga)} (Stok ${p.stok||0}) - Foto: ${p.fit||'contain'}</div><span><button class="btn btn-sm btn-warning" onclick="editProduk(${p.id})">Edit</button> <button class="btn btn-sm btn-danger" onclick="hapusProduk(${p.id})">Hapus</button></span></div>`).join('');}
+function updateDashboard(){document.getElementById('statProduk').innerText=products.length;document.getElementById('statPesanan').innerText=orders.length;document.getElementById('statOmset').innerText=formatRupiah(orders.reduce((a,b)=>a+b.total,0));document.getElementById('statKunjung').innerText=kunjungan;document.getElementById('topProduk').innerHTML=products.slice(0,3).map(p=>`<div class="d-flex justify-content-between border-bottom py-2">${p.nama} <b>${formatRupiah(p.harga)}</b></div>`).join('')||'Belum ada produk';document.getElementById('recentOrder').innerHTML=orders.slice(0,5).map(o=>`<div class="border p-2 mb-2 rounded"><b>${o.nama}</b> - ${formatRupiah(o.total)} <br><small>${o.tanggal} - ${o.alamat}</small></div>`).join('')||'Belum ada pesanan';}
+async function simpanProduk(){let id=document.getElementById('editId').value;let nama=document.getElementById('pNama').value,harga=parseInt(document.getElementById('pHarga').value),img=document.getElementById('pGambar').value,desc=document.getElementById('pDesc').value,stok=parseInt(document.getElementById('pStok').value)||0,fit=document.getElementById('pFit').value||'contain';if(!nama||!harga){alert('Nama & Harga wajib diisi!');return}if(id){let p=products.find(x=>x.id==id);p.nama=nama;p.harga=harga;p.img=img||p.img;p.desc=desc;p.stok=stok;p.fit=fit;}else{products.push({id:Date.now(),nama,harga,img:img||'https://via.placeholder.com/500',desc,stok,fit})}document.getElementById('editId').value='';document.getElementById('pNama').value='';document.getElementById('pHarga').value='';document.getElementById('pGambar').value='';document.getElementById('pDesc').value='';document.getElementById('pStok').value='';await saveKeCloud();tampilkanProduk();tampilkanAdminList();updateDashboard();let btn=document.getElementById('btnSimpanProduk');let teksAwal=btn.innerText;btn.innerText='✅ Produk Tersimpan! Udah Muncul Di Semua HP';btn.classList.add('btn-saved');showSaveToast('✅ Produk '+nama+' Berhasil Disimpan Ke JSONBin!');setTimeout(()=>{btn.innerText=teksAwal;btn.classList.remove('btn-saved')},2000);}
+function tampilkanAdminList(){if(products.length==0){document.getElementById('listAdminProduk').innerHTML='<div class="alert alert-info">Belum ada produk. Silahkan tambah di atas. Nanti kalo lu udah tau mau jual apa, tinggal isi di sini.</div>';return}document.getElementById('listAdminProduk').innerHTML=products.map(p=>`<div class="d-flex justify-content-between align-items-center border p-2 mb-1 bg-white rounded"><div><img src="${p.img}" style="width:50px;height:50px;object-fit:cover;border-radius:8px"> ${p.nama} - ${formatRupiah(p.harga)} (Stok ${p.stok||0}) - Foto: ${p.fit||'contain'}</div><span><button class="btn btn-sm btn-warning" onclick="editProduk(${p.id})">Edit</button> <button class="btn btn-sm btn-danger" onclick="hapusProduk(${p.id})">Hapus</button></span></div>`).join('');}
 function editProduk(id){let p=products.find(x=>x.id==id);document.getElementById('editId').value=p.id;document.getElementById('pNama').value=p.nama;document.getElementById('pHarga').value=p.harga;document.getElementById('pGambar').value=p.img;document.getElementById('pDesc').value=p.desc;document.getElementById('pStok').value=p.stok;document.getElementById('pFit').value=p.fit||'contain';window.scrollTo(0,0);}
-function hapusProduk(id){if(confirm('Hapus produk ini?')){products=products.filter(x=>x.id!=id);save();tampilkanProduk();tampilkanAdminList();updateDashboard();showSaveToast('✅ Produk Dihapus!');}}
+async function hapusProduk(id){if(confirm('Hapus produk ini?')){products=products.filter(x=>x.id!=id);await saveKeCloud();tampilkanProduk();tampilkanAdminList();updateDashboard();showSaveToast('✅ Produk Dihapus!');}}
 function tampilkanPesanan(){document.getElementById('listPesanan').innerHTML=orders.map(o=>`<div class="card p-3 mb-2"><b>${o.nama} - ${formatRupiah(o.total)}</b><small>${o.tanggal} | ${o.alamat}</small><ul>${o.items.map(i=>`<li>${i.nama} x ${i.qty}</li>`).join('')}</ul></div>`).join('')||'Belum ada pesanan';}
-function hapusSemuaPesanan(){if(confirm('Hapus semua pesanan?')){orders=[];save();tampilkanPesanan();updateDashboard();}}
+async function hapusSemuaPesanan(){if(confirm('Hapus semua pesanan?')){orders=[];await saveKeCloud();tampilkanPesanan();updateDashboard();}}
 function isiSettingForm(){document.getElementById('inputNamaToko').value=setting.nama;document.getElementById('inputDescToko').value=setting.desc;document.getElementById('inputBanner').value=setting.banner;document.getElementById('inputWA').value=setting.wa;document.getElementById('inputWarna').value=setting.warna||'#FF5DA2';document.getElementById('inputWarnaText').value=setting.warna||'#FF5DA2';document.getElementById('inputLogo').value=setting.logo||'';document.getElementById('inputBannerImg').value=setting.bannerImg||'';let pl=document.getElementById('previewLogo'); if(setting.logo){pl.src=setting.logo; pl.classList.add('show');} let pb=document.getElementById('previewBanner'); if(setting.bannerImg){pb.src=setting.bannerImg; pb.classList.add('show');}}
-function simpanSetting(){setting.nama=document.getElementById('inputNamaToko').value||setting.nama;setting.desc=document.getElementById('inputDescToko').value||setting.desc;setting.banner=document.getElementById('inputBanner').value||setting.banner;setting.warna=document.getElementById('inputWarnaText').value||document.getElementById('inputWarna').value||setting.warna;setting.logo=document.getElementById('inputLogo').value||setting.logo;setting.bannerImg=document.getElementById('inputBannerImg').value||setting.bannerImg;save();updateTokoUI();let btn=document.getElementById('btnSimpanSetting');let teksAwal=btn.innerText;btn.innerText='✅ Tersimpan! Warna & Pengaturan Berhasil Diubah';btn.classList.add('btn-saved');showSaveToast('✅ Pengaturan Berhasil Disimpan!');setTimeout(()=>{btn.innerText=teksAwal;btn.classList.remove('btn-saved')},2500);}
-function gantiAkun(){let u=document.getElementById('newUser').value.trim();let p=document.getElementById('newPass').value.trim();if(!u||!p){alert('Isi username & password baru!');return}akun={user:u,pass:p};save();showSaveToast('✅ Akun Berhasil Diganti!');}
-function resetToko(){if(confirm('Reset semua?')){localStorage.clear();location.reload();}}
-tampilkanProduk();updateDashboard();
+async function simpanSetting(){setting.nama=document.getElementById('inputNamaToko').value||setting.nama;setting.desc=document.getElementById('inputDescToko').value||setting.desc;setting.banner=document.getElementById('inputBanner').value||setting.banner;setting.wa=document.getElementById('inputWA').value||setting.wa;setting.warna=document.getElementById('inputWarnaText').value||document.getElementById('inputWarna').value||setting.warna;setting.logo=document.getElementById('inputLogo').value||setting.logo;setting.bannerImg=document.getElementById('inputBannerImg').value||setting.bannerImg;await saveKeCloud();updateTokoUI();let btn=document.getElementById('btnSimpanSetting');let teksAwal=btn.innerText;btn.innerText='✅ Tersimpan! Udah Keubah Di Semua HP';btn.classList.add('btn-saved');showSaveToast('✅ Pengaturan Berhasil Disimpan Ke JSONBin!');setTimeout(()=>{btn.innerText=teksAwal;btn.classList.remove('btn-saved')},2500);}
+async function gantiAkun(){let u=document.getElementById('newUser').value.trim();let p=document.getElementById('newPass').value.trim();if(!u||!p){alert('Isi username & password baru!');return}akun={user:u,pass:p};await saveKeCloud();showSaveToast('✅ Akun Berhasil Diganti!');}
+async function resetToko(){if(confirm('Reset semua?')){products=[];orders=[];await saveKeCloud();location.reload();}}
+loadDariCloud();
 </script>
 </body>
 </html>
