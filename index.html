@@ -143,22 +143,25 @@ button[onclick="scrollCart()"] {
   bottom: 14px !important;
   margin: 0 !important;
 }
-/* LAPTOP: 4 KOLOM BIAR PENUH */
+/* FIX FINAL: HP 2 KOLOM, LAPTOP 4 KOLOM */
 #daftarProduk, #produk, #listProduk, #produkList, #containerProduk, #katalog, main {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 16px !important;
-  padding: 16px !important;
-  max-width: 1100px !important;
-  margin: 0 auto !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding: 10px !important;
 }
-/* HP DOANG: JADI 2 KOLOM */
-@media (max-width: 600px) {
-  #daftarProduk, #produk, #listProduk, #produkList, #containerProduk, #katalog, main {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-    padding: 10px !important;
+.produk, .card, .product {
+  width: calc(50% - 5px) !important;
+  flex: none !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+@media (min-width: 601px) {
+  .produk, .card, .product {
+    width: calc(25% - 12px) !important;
   }
+}
 }
 </style>
 </head>
