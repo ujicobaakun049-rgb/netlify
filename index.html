@@ -7,13 +7,13 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
 body{background:#f1f3f5}
-.hero{background:#89CFF0;color:#fff;padding:0 0 35px 0;text-align:center;border-radius:0 0 20px 20px;position:relative;overflow:hidden}
+.hero{background:#1E3A8A;color:#fff;padding:0 0 35px 0;text-align:center;border-radius:0 0 20px 20px;position:relative;overflow:hidden}
 .hero-banner{width:100%;height:220px;object-fit:cover;display:none}
 .hero-banner.show{display:block}
 .hero-logo{width:90px;height:90px;object-fit:cover;border-radius:50%;border:4px solid #fff;background:#fff;margin-top:-45px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:none}
 .hero-logo.show{display:inline-block}
 .card img{height:220px;object-fit:contain;background:#fff;padding:8px}
-.sidebar{background:#89CFF0;color:#fff;min-height:100vh;padding:20px;text-align:center}
+.sidebar{background:#1E3A8A;color:#fff;min-height:100vh;padding:20px;text-align:center}
 .sidebar a{color:#fff;text-decoration:none;display:block;padding:10px;border-radius:8px;margin-bottom:5px;text-align:left}
 .sidebar a.active,.sidebar a:hover{background:#ffc107;color:#000}
 .sidebar-logo{width:80px;height:80px;object-fit:cover;border-radius:50%;border:3px solid #fff;background:#fff;display:none;margin:0 auto 10px}
@@ -34,13 +34,13 @@ body{background:#f1f3f5}
 .cart-badge.bump{transform:scale(1.4)}
 .shopee-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#222;color:#fff;padding:12px 16px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:99999;box-shadow:0 8px 25px rgba(0,0,0,0.35);opacity:0;transition:all 0.3s;max-width:92%;font-size:14px}
 .shopee-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.shopee-toast button{background:#89CFF0;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-weight:bold;white-space:nowrap}
+.shopee-toast button{background:#1E3A8A;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-weight:bold;white-space:nowrap}
 .shopee-toast img{width:38px;height:38px;object-fit:cover;border-radius:8px}
 .save-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#198754;color:#fff;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:10px;z-index:100000;box-shadow:0 8px 25px rgba(0,0,0,0.35);opacity:0;transition:all 0.3s;font-size:15px;font-weight:bold;max-width:92%}
 .save-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .btn-saved{background:#198754!important;color:#fff!important}
 .sync-badge{font-size:12px;background:#198754;color:#fff;padding:3px 8px;border-radius:20px}
-  /* === TAMPILAN PRODUK ALA SHOPEE === */
+/* === TAMPILAN PRODUK ALA SHOPEE === */
 #productList, .product-grid, .products, #products {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
@@ -122,12 +122,6 @@ button[onclick*="lihatKeranjang"],
   background: #1E3A8A !important;
   color: white !important;
 }
-
-/* Paksa semua sisa warna pink jadi biru */
-[style*="#FF5DA2"] {
-  background-color: #1E3A8A !important;
-}
- 
   /* Ini tombol keranjangnya */
 header button, .header button,
 button[onclick*="Keranjang"], button[onclick*="keranjang"],
@@ -150,9 +144,9 @@ button[onclick*="Keranjang"], button[onclick*="keranjang"],
 <img id="bannerImgToko" class="hero-banner" src="">
 <img id="logoImgToko" class="hero-logo" src="">
 <div style="padding:15px 10px 0">
-<h1 id="namaToko" onclick="klikNamaToko()" style="cursor:pointer;user-select:none;margin-top:10px">RGB STORE</h1>
+<h1 id="namaToko" onclick="klikNamaToko()" style="cursor:pointer;user-select:none;margin-top:10px">CikiCuy</h1>
 <p id="descToko">Toko Online Murah, Cepat & Terpercaya</p>
-<button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang <span id="jumlahCart" class="cart-badge" style="display:inline-block">0</span>)</button>
+<button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang <span id="jumlahCart" class="cart-badge" style="display:inline-block">0</span></button>
 <div class="mt-2"><span id="syncStatus" class="sync-badge" style="display:none;">☁️ Sinkron JSONBin</span></div>
 </div>
 </div>
@@ -160,7 +154,7 @@ button[onclick*="Keranjang"], button[onclick*="keranjang"],
 <div class="alert alert-warning text-center" id="bannerToko">🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!</div>
 <div class="row mb-3">
 <div class="col"><input id="cari" class="form-control" placeholder="🔍 Cari produk..." oninput="tampilkanProduk()"></div>
-<div class="col-auto"><select id="filterHarga" class="form-select" onchange="tampilkanProduk()"><option value="semua">Semua Harga</option><option value="murah">Dibawah 200rb</option><option value="mahal">Diatas 200rb</option></select></div>
+<div class="col-auto"><select id="filterHarga" class="form-select" onchange="tampilkanProduk()"><option value="semua">Semua Harga</option><option value="murah">Dibawah 20rb</option><option value="mahal">Diatas 20rb</option></select></div>
 </div>
 <div class="row" id="listProduk"><p class="text-center">⏳ Memuat produk dari JSONBin...</p></div>
 </div>
@@ -192,7 +186,7 @@ button[onclick*="Keranjang"], button[onclick*="keranjang"],
 <div class="row g-0">
 <div class="col-md-3 sidebar" id="sidebarAdmin">
 <img id="logoSidebar" class="sidebar-logo" src="">
-<h3>📊 RGB STORE ADMIN</h3><p>Selamat datang, <b id="namaAdmin">admin</b></p><p><span class="badge bg-success">☁️ JSONBin Online</span></p>
+<h3> CikiCuy ADMIN</h3><p>Selamat datang, <b id="namaAdmin">admin</b></p><p><span class="badge bg-success">☁️ JSONBin Online</span></p>
 <a href="#" class="active" onclick="showTab('tabHome',this)">🏠 Dashboard</a>
 <a href="#" onclick="showTab('tabProduk',this)">📦 Produk</a>
 <a href="#" onclick="showTab('tabPesanan',this)">🧾 Pesanan</a>
@@ -250,7 +244,7 @@ const API_URL = "https://api.jsonbin.io/v3/b/" + BIN_ID;
 let products=[];
 let cart=JSON.parse(localStorage.getItem('myCart')||'[]');
 let orders=[];
-let setting={"nama":"RGB STORE","wa":"6285178360714","desc":"Toko Online Murah, Cepat & Terpercaya","banner":"🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!","warna":"#FF5DA2","logo":"","bannerImg":""};
+let setting={"nama":"CikiCuy","wa":"6285178360714","desc":"Toko Online Murah, Cepat & Terpercaya","banner":"🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!","warna":"#1E3A8A","logo":"","bannerImg":""};
 let akun={"user":"admin","pass":"admin123"};
 let kunjungan=parseInt(localStorage.getItem('myKunjung')||'0')+1; localStorage.setItem('myKunjung',kunjungan);
 let klikNama=0; let klikTimer=null; let toastTimer=null; let saveToastTimer=null; let isSaving=false;
