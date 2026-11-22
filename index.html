@@ -143,12 +143,24 @@ button[onclick="scrollCart()"] {
   bottom: 14px !important;
   margin: 0 !important;
 }
-  /* CUMA BIKIN JADI 2 KOLOM */
-#daftarProduk {
+/* PAKSA JADI 2 KOLOM - SEMUA NAMA WADAH */
+#daftarProduk, #produk, #listProduk, #produkList, #containerProduk, #katalog, main {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
   gap: 10px !important;
   padding: 10px !important;
+}
+
+/* Biar kartunya ngecilin */
+.produk, .card, .product, .item {
+  width: 100% !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+.produk img {
+  height: 140px !important;
+  object-fit: cover !important;
+}
 }
 </style>
 </head>
