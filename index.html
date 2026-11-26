@@ -150,15 +150,16 @@ button[onclick*="Keranjang"], button[onclick*="keranjang"],
     width: calc(25% - 12px) !important;
   }
 }
-  /* PINDAHIN KERANJANG KE KIRI */
-header {
-  display: flex !important;
-  flex-direction: row-reverse !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-}
-header h1, header .logo {
-  margin-left: auto !important;
+<style>
+  /* Keranjang pindah ke kiri */
+  .cart-btn, button[onclick*="cart"], a[href*="cart"] {
+    position: fixed !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 12px !important;
+    z-index: 9999 !important;
+  }
+</style>
 }
 </style>
 </head>
