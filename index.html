@@ -143,23 +143,24 @@ button[onclick*="Keranjang"], button[onclick*="keranjang"],
 <div class="hero" id="heroToko">
 <img id="bannerImgToko" class="hero-banner" src="">
 <img id="logoImgToko" class="hero-logo" src="">
-<div style="padding:15px 10px 0; display:flex; align-items:flex-start; gap:12px; text-align:left;">
-<button class="btn btn-warning" onclick="scrollCart()" style="margin-top:15px; flex-shrink:0;">🛒 Keranjang <span id="jumlahCart" class="cart-badge" style="display:inline-block">0</span></button>
-<div>
+<div style="padding:15px 10px 0">
 <h1 id="namaToko" onclick="klikNamaToko()" style="cursor:pointer;user-select:none;margin-top:10px">CikiCuy</h1>
 <p id="descToko">Toko Online Murah, Cepat & Terpercaya</p>
+<button class="btn btn-warning" onclick="scrollCart()">🛒 Keranjang <span id="jumlahCart" class="cart-badge" style="display:inline-block">0</span></button>
 <div class="mt-2"><span id="syncStatus" class="sync-badge" style="display:none;">☁️ Sinkron JSONBin</span></div>
 </div>
 </div>
+
+<div class="container my-4">
+<div class="alert alert-warning text-center" id="bannerToko">🔥 PROMO: Gratis Ongkir Untuk Pembelian Pertama!</div>
+<div class="row mb-3">
+<div class="col"><input id="cari" class="form-control" placeholder="🔍 Cari produk..." oninput="tampilkanProduk()"></div>
+<div class="col-auto"><select id="filterHarga" class="form-select" onchange="tampilkanProduk()"><option value="semua">Semua Harga</option><option value="mura</div>
+</div>
+<div class="row" id="listProduk"><p class="text-center">⏳ Memuat produk dari JSONBin...</p></div>
+</div>
 <div class="container mb-5" id="cartSection">
 <h3>Keranjang Belanja</h3>
-<ul class="list-group" id="cartList"></ul>
-<h4 class="mt-3">Total: <span id="totalHarga">Rp 0</span></h4>
-<input id="namaPembeli" class="form-control my-2" placeholder="Nama Kamu">
-<input id="alamatPembeli" class="form-control my-2" placeholder="Alamat / Catatan">
-<button class="btn btn-success" onclick="checkoutWA()">Checkout via WhatsApp</button>
-<button class="btn btn-danger" onclick="hapusCart()">Hapus Keranjang</button>
-</div>
 </div>
 <div id="shopeeToast" class="shopee-toast"><img id="toastImg" src=""><span id="toastText">Ditambah ke keranjang!</span><button onclick="scrollCart();hideToast()">Lihat Keranjang</button></div>
 <div id="saveToast" class="save-toast">✅ <span id="saveToastText">Berhasil Disimpan!</span></div>
